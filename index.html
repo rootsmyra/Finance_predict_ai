@@ -1,0 +1,190 @@
+<!-- 1. Ana HTML Dosyası (index.html) -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance-AI - Geliştirilmiş</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="container">
+    <div class="section">
+      <input class="search-bar" type="text" placeholder="Hisse aramak için yazın (örn: THYAO, ASELS)" id="searchInput">
+      <div id="fileUploadSection" style="margin-bottom: 20px; text-align: center;">
+        <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
+        <button id="uploadBtn" onclick="document.getElementById('excelFile').click()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
+          📂 Excel Dosyası Yükle (tumhisse.xlsx)
+        </button>
+      </div>
+      <h2>BIST 100 Hisseleri</h2>
+      <div id="loadingInfo" class="loading-info" style="display: none;">
+        📊 BIST100 verileri yükleniyor...
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Hisse</th>
+            <th>Son Fiyat</th>
+            <th>Değişim (%)</th>
+            <th>Değişim (TL)</th>
+            <th>Hacim (Adet)</th>
+          </tr>
+        </thead>
+        <tbody id="stockTable"></tbody>
+      </table>
+      <button id="gosterBtn" onclick="dahaFazlaGoster()" class="more-btn">
+        Daha fazla göster
+      </button>
+      <button id="azGosterBtn" onclick="dahaAzGoster()" class="less-btn">
+        Daha az göster
+      </button>
+    </div>
+    
+    <div class="section">
+      <h2>Haberler</h2>
+      <div class="news-cards" id="newsContainer"></div>
+    </div>
+    
+    <div class="section" id="doviz-section">
+      <h2>💱 Döviz Kurları</h2>
+      <table class="exchange-table" id="dovizTable">
+        <thead>
+          <tr>
+            <th>Para Birimi</th>
+            <th>TL Karşılığı</th>
+            <th>Değişim</th>
+          </tr>
+        </thead>
+        <tbody id="dovizTableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="endeks-section">
+      <h2>📊 Endeksler</h2>
+      <div style="margin-bottom: 15px; text-align: center;">
+        <input type="file" id="endeksFile" accept=".xlsx,.xls" style="display: none;" onchange="handleIndexFileSelect(event)">
+        <button onclick="document.getElementById('endeksFile').click()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 10px;">
+          📂 Endeks Excel Yükle
+        </button>
+        <small style="color: #999;">endeksbist.xlsx</small>
+      </div>
+      <table class="exchange-table" id="endeksTable">
+        <thead>
+          <tr>
+            <th>Endeks</th>
+            <th>Değer</th>
+            <th>Değişim</th>
+          </tr>
+        </thead>
+        <tbody id="endeksTableBody">
+        </tbody>
+      </table>
+      <button id="endeksGosterBtn" onclick="endeksDahaFazlaGoster()" class="more-btn">
+        Daha fazla göster
+      </button>
+      <button id="endeksAzGosterBtn" onclick="endeksDahaAzGoster()" class="less-btn">
+        Daha az göster
+      </button>
+    </div>
+
+    <div class="section" id="commodity-section">
+      <h2>🥇 Emtia Fiyatları</h2>
+      <div style="margin-bottom: 15px; text-align: center;">
+        <input type="file" id="commodityFile" accept=".xlsx,.xls" style="display: none;" onchange="handleCommodityFileSelect(event)">
+        <button onclick="document.getElementById('commodityFile').click()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 10px;">
+          📂 Emtia Excel Yükle
+        </button>
+        <small style="color: #999;">emtia.xlsx</small>
+      </div>
+      <table class="exchange-table" id="commodityTable">
+        <thead>
+          <tr>
+            <th>Emtia</th>
+            <th>Fiyat</th>
+            <th>Değişim</th>
+          </tr>
+        </thead>
+        <tbody id="commodityTableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="coin-section">
+      <h2>₿ Kripto Paralar</h2>
+      <div style="margin-bottom: 15px; text-align: center;">
+        <input type="file" id="cryptoFile" accept=".csv" style="display: none;" onchange="handleCryptoFileSelect(event)">
+        <button onclick="document.getElementById('cryptoFile').click()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 10px;">
+          📂 Kripto CSV Yükle
+        </button>
+        <small style="color: #999;">Kripto Paralar.csv</small>
+      </div>
+      <table class="exchange-table" id="coinTable">
+        <thead>
+          <tr>
+            <th>Kripto Para</th>
+            <th>USD Fiyatı</th>
+            <th>Değişim (24s)</th>
+          </tr>
+        </thead>
+        <tbody id="coinTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Hisse Detay Modal -->
+  <div id="stockModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="stockTitle">Hisse Detayı</h2>
+
+      <div id="modal-graph-container"></div>
+
+      <div class="prediction-buttons" id="predictionButtons" style="display: none;">
+        <button class="prediction-btn" onclick="showDatePrediction()">
+          📅 Tarihe Göre Tahmin
+        </button>
+      </div>
+      
+      <div id="predictionInputArea" style="display: none; margin-top: 15px;">
+        <label for="predictionDate" style="display: block; margin-bottom: 5px; color: #ccc;">Tahmin Tarihi:</label>
+        <input type="date" id="predictionDate" class="prediction-input">
+        <p id="maxDateInfo" style="color: #aaa; font-size: 13px; margin-top: 5px;"></p>
+        <button onclick="getPrediction()" class="prediction-btn" style="margin-left: 10px;">Tahmin Et</button>
+      </div>
+      
+      <div id="predictionResult" style="display: none;">
+        <div id="predictionContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- External Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- Modüler JavaScript Dosyaları -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/excel-handler.js"></script>
+  <script src="js/file-upload-managers.js"></script>
+  <script src="js/stock-manager.js"></script>
+  <script src="js/news-manager.js"></script>
+  <script src="js/currency-manager.js"></script>
+  <script src="js/index-manager.js"></script>
+  <script src="js/mta-manager.js"></script>
+  <script src="js/crypto-manager.js"></script>
+  <script src="js/modal-manager.js"></script>
+  <script src="js/chart-manager.js"></script>
+  <script src="js/prediction-manager.js"></script>
+  <script src="js/main.js"></script>
+
+</body>
+</html>
